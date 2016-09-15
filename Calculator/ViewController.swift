@@ -104,7 +104,7 @@ class ViewController: UIViewController {
         } else {
             displayValue = 0
         }
-//        print("Operand Stack = \(operandStack)")
+        print("Operand Stack = \(operandStack)")
     }
     
     var displayValue: Double {
@@ -119,7 +119,8 @@ class ViewController: UIViewController {
     }
     
     @IBAction func clear() {
-        operandStack.removeAll()
+//        operandStack.removeAll()
+        brain.clearOpStack()
         display.text = "\(0)"
         userHistory.text = ""
         userIsInTheMiddleOfTypingANumber = false

@@ -90,4 +90,8 @@ class CalculatorBrain {
         
         return evaluate()
     }
+    
+    func clearOpStack() {
+        opStack.removeAll()
+    }
 }
