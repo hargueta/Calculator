@@ -37,7 +37,6 @@ class ViewController: UIViewController {
     }
     
     @IBAction func operate(sender: UIButton) {
-//        let operation = sender.currentTitle!
         
         if userIsInTheMiddleOfTypingANumber {
             enter()
@@ -52,49 +51,12 @@ class ViewController: UIViewController {
                 displayValue = 0
             }
         }
-        
-        
-        
-//        switch operation {
-//            case "✕": performOperation {$0 * $1}
-//            case "÷": performOperation {$1 / $0}
-//            case "+": performOperation {$0 + $1}
-//            case "-": performOperation {$1 - $0}
-//            case "√": performOperation {sqrt($0)}
-//            case "sin": performOperation { sin($0) }
-//            case "cos": performOperation { cos($0) }
-//            case "π":
-//                displayValue = M_PI
-//                enter()
-//            default:
-//                break
-//        }
     }
-    
-//    func performOperation(operation: (Double, Double) -> Double) {
-//        if operandStack.count >= 2 {
-//            displayValue = operation(operandStack.removeLast(), operandStack.removeLast())
-//            didPerformOperation = true
-//            enter()
-//            didPerformOperation = false
-//        }
-//    }
-//    
-//    private func performOperation(operation: Double -> Double) {
-//        if operandStack.count >= 1 {
-//            displayValue = operation(operandStack.removeLast())
-//            didPerformOperation = true
-//            enter()
-//            didPerformOperation = false
-//        }
-//    }
-    
     
     var operandStack = Array<Double>()
     
     @IBAction func enter() {
         userIsInTheMiddleOfTypingANumber = false
-//        operandStack.append(displayValue)
         if !didPerformOperation {
             userHistory.text = userHistory.text! + " " + "\(displayValue)"
         }
@@ -104,7 +66,6 @@ class ViewController: UIViewController {
         } else {
             displayValue = 0
         }
-        print("Operand Stack = \(operandStack)")
     }
     
     var displayValue: Double {
@@ -119,7 +80,6 @@ class ViewController: UIViewController {
     }
     
     @IBAction func clear() {
-//        operandStack.removeAll()
         brain.clearOpStack()
         display.text = "\(0)"
         userHistory.text = ""
