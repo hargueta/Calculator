@@ -8,12 +8,13 @@
 
 import Foundation
 
-
 class CalculatorBrain {
     private enum Op : CustomStringConvertible {
         case Operand(Double)
         case UnaryOperation(String, Double -> Double)
         case BinaryOperation(String, (Double, Double) -> Double)
+        case Variable(String)
+        case Constant(String, Double)
         
         var description: String {
             get {
@@ -24,7 +25,13 @@ class CalculatorBrain {
                     return symbol
                 case .BinaryOperation(let symbol, _):
                     return symbol
+                case .Variable(let symbol):
+                    return "\(symbol)"
+                case .Constant(let symbol, _):
+                    return "\(symbol)"
                 }
+                
+                
             }
         }
     }
@@ -32,6 +39,8 @@ class CalculatorBrain {
     private var opStack = [Op]()
     
     private var knownOps = Dictionary<String, Op>()
+    
+    var variableValues = Dictionary<String, Double>()
     
     init() {
         knownOps["✕"] = Op.BinaryOperation("✕", *)
@@ -41,7 +50,7 @@ class CalculatorBrain {
         knownOps["√"] = Op.UnaryOperation("√", sqrt)
         knownOps["sin"] = Op.UnaryOperation("sin", sin)
         knownOps["cos"] = Op.UnaryOperation("cos", cos)
-        knownOps["π"] = Op.UnaryOperation("π") {$0 * M_PI}
+        knownOps["π"] = Op.Constant("π", M_PI)
     }
     
     var program: AnyObject { // guaranteed to be a PropertyList
@@ -86,6 +95,13 @@ class CalculatorBrain {
                         return (operation(operand1, operand2), op2Evaluation.remainingOps)
                     }
                 }
+            case .Variable(let variable):
+                if let variableValue = variableValues[variable] {
+                    return (variableValue, remainingOps)
+                }
+                
+            case .Constant(_, let constantValue):
+                return (constantValue, remainingOps)
             }
         }
         
@@ -103,6 +119,18 @@ class CalculatorBrain {
     func pushOperand(operand: Double) -> Double? {
         opStack.append(Op.Operand(operand))
         
+        return evaluate()
+    }
+    
+    func pushOperand(operand: String) -> Double? {
+        opStack.append(Op.Variable(operand))
+        return evaluate()
+    }
+    
+    func pushConstant(symbol: String) -> Double? {
+        if let constant = knownOps[symbol] {
+            opStack.append(constant)
+        }
         return evaluate()
     }
     

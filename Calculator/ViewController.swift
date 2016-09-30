@@ -35,9 +35,15 @@ class ViewController: UIViewController {
             userIsInTheMiddleOfTypingANumber = true
         }
     }
+    @IBAction func pi(sender: UIButton) {
+        if userIsInTheMiddleOfTypingANumber {
+            enter()
+        }
+        
+        displayValue = brain.pushConstant("π")
+    }
     
     @IBAction func operate(sender: UIButton) {
-        
         if userIsInTheMiddleOfTypingANumber {
             enter()
         }
@@ -53,29 +59,58 @@ class ViewController: UIViewController {
         }
     }
     
+    @IBAction func setM(sender: UIButton) {
+        userIsInTheMiddleOfTypingANumber = false
+        
+        if displayValue != nil {
+            brain.variableValues["M"] = displayValue!
+        }
+        
+        displayValue = brain.evaluate()
+    }
+    
+    @IBAction func getM(sender: UIButton) {
+        if(userIsInTheMiddleOfTypingANumber) {
+            enter()
+        }
+        
+        displayValue = brain.pushOperand("M")
+    }
+    
+    
     var operandStack = Array<Double>()
     
     @IBAction func enter() {
         userIsInTheMiddleOfTypingANumber = false
         if !didPerformOperation {
-            userHistory.text = userHistory.text! + " " + "\(displayValue)"
+            if let disValue = displayValue {
+                userHistory.text = userHistory.text! + " " + "\(disValue)"
+            }
+            
         }
         
-        if let result = brain.pushOperand(displayValue) {
-            displayValue = result
-        } else {
-            displayValue = 0
+        if let disValue = displayValue {
+            if let result = brain.pushOperand(disValue) {
+                displayValue = result
+            } else {
+                displayValue = 0
+            }
         }
+        
     }
     
-    var displayValue: Double {
+    var displayValue: Double? {
         get {
             return NSNumberFormatter().numberFromString(display.text!)!.doubleValue
         }
         
         set {
-            display.text = "\(newValue)"
-            userIsInTheMiddleOfTypingANumber = false
+            if let disValue = newValue {
+                display.text = "\(disValue)"
+                userIsInTheMiddleOfTypingANumber = false
+            } else {
+                display.text = nil
+            }
         }
     }
     
@@ -83,6 +118,7 @@ class ViewController: UIViewController {
         brain.clearOpStack()
         display.text = "\(0)"
         userHistory.text = ""
+        brain.variableValues.removeAll()
         userIsInTheMiddleOfTypingANumber = false
     }
 }
