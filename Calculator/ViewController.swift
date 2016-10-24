@@ -49,7 +49,7 @@ class ViewController: UIViewController {
         }
         
         if let operation = sender.currentTitle {
-            userHistory.text = userHistory.text! + " " + operation
+//            userHistory.text = userHistory.text! + " " + operation
             
             if let result = brain.performOperation(operation) {
                 displayValue = result
@@ -84,7 +84,8 @@ class ViewController: UIViewController {
         userIsInTheMiddleOfTypingANumber = false
         if !didPerformOperation {
             if let disValue = displayValue {
-                userHistory.text = userHistory.text! + " " + "\(disValue)"
+//                userHistory.text = userHistory.text! + " " + "\(disValue)"
+                
             }
             
         }
@@ -111,6 +112,16 @@ class ViewController: UIViewController {
             } else {
                 display.text = nil
             }
+        
+            if brain.opStackLength() > 1 {
+                if let disValue = newValue {
+                    if !brain.description.isEmpty {
+                        userHistory.text = "\(brain.description) = \(disValue)"
+                    }
+                }
+                
+            }
+            
         }
     }
     

@@ -34,13 +34,29 @@ class CalculatorBrain {
                 
             }
         }
+        
+        var precedence: Int {
+            switch self {
+            case .Operand(_), .Variable(_), .Constant(_, _), .UnaryOperation(_, _):
+                return Int.max
+            case .BinaryOperation(_, _):
+                return Int.min
+            }
+        }
     }
+    
+    
     
     private var opStack = [Op]()
     
     private var knownOps = Dictionary<String, Op>()
     
     var variableValues = Dictionary<String, Double>()
+    
+    var description: String {
+        let (desc, _) = description([String](), ops: opStack)
+        return desc.joinWithSeparator(", ")
+    }
     
     init() {
         knownOps["✕"] = Op.BinaryOperation("✕", *)
@@ -108,6 +124,47 @@ class CalculatorBrain {
         return (nil, ops)
     }
     
+    private func description(desc: [String], ops: [Op]) -> (descriptionResult: [String], remainingOps: [Op]) {
+        var descriptionResult = desc
+        if !ops.isEmpty {
+            var remainingOps = ops
+            let op = remainingOps.removeFirst()
+            switch op {
+            case .UnaryOperation(let symbol, _):
+                if !descriptionResult.isEmpty {
+                    let unaryOperand = descriptionResult.removeLast()
+                    descriptionResult.append(symbol + "(\(unaryOperand))")
+                    let (newDescription, remainingOps) = description(descriptionResult, ops: remainingOps)
+                    return (newDescription, remainingOps)
+                }
+            case .BinaryOperation(let symbol, _):
+                if !descriptionResult.isEmpty {
+                    let lastBinOperand = descriptionResult.removeLast()
+                    if !descriptionResult.isEmpty {
+                        let binaryOperandFirst = descriptionResult.removeLast()
+                        if op.description == remainingOps.first?.description || op.precedence == remainingOps.first?.precedence {
+                            descriptionResult.append("(\(binaryOperandFirst)" + symbol + "\(lastBinOperand))")
+                        } else {
+                            descriptionResult.append("\(binaryOperandFirst)" + symbol + "\(lastBinOperand)")
+                        }
+                        return description(descriptionResult, ops: remainingOps)
+                    } else {
+                        descriptionResult.append("?" + symbol + "\(lastBinOperand)")
+                        return description(descriptionResult, ops: remainingOps)
+                    }
+                } else {
+                    descriptionResult.append("?" + symbol + "?")
+                    return description(descriptionResult, ops: remainingOps)
+                }
+            case .Operand(_), .Variable(_), .Constant(_, _):
+                descriptionResult.append(op.description)
+                return description(descriptionResult, ops: remainingOps)
+                
+            }
+        }
+        return (descriptionResult, ops)
+    }
+    
     func evaluate() -> Double? {
         let (result, _) = evaluate(opStack)
         
@@ -144,5 +201,9 @@ class CalculatorBrain {
     
     func clearOpStack() {
         opStack.removeAll()
+    }
+    
+    func opStackLength() -> Int {
+        return opStack.count
     }
 }
